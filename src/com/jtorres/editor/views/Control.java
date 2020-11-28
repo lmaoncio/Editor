@@ -179,7 +179,7 @@ public class Control extends JPanel {
         gbc.gridwidth = 1;
         add(tamanoTxt, gbc);
 
-        tamanoJsl = new JSlider(JSlider.HORIZONTAL, 2, 10, 2);
+        tamanoJsl = new JSlider(JSlider.HORIZONTAL, 0, 10, 0);
         tamanoJsl.setPaintLabels(true);
         gbc.gridx = 1;
         gbc.gridy = 5;
@@ -355,7 +355,6 @@ public class Control extends JPanel {
     }
 
     public void paintSelected(ButtonsStatus buttonsStatus) {
-
         todoBtn.setSelected(buttonsStatus.isZona1Btn());
         rectanguloBtn.setSelected(buttonsStatus.isZona2Btn());
         tamanoJsl.setValue(buttonsStatus.getTamanoJsl());
@@ -366,7 +365,6 @@ public class Control extends JPanel {
         azulJsl.setValue(buttonsStatus.getAzulJsl());
         greyBtn.setSelected(buttonsStatus.isGreyBtn());
         filtrosJsl.setValue(buttonsStatus.getFiltrosJsl());
-
         this.repaint();
 
     }

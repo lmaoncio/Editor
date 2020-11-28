@@ -4,7 +4,6 @@ import com.jtorres.editor.model.ButtonsStatus;
 import com.jtorres.editor.model.Filtro;
 import com.jtorres.editor.services.ImageConverter;
 import com.jtorres.editor.views.Control;
-import com.jtorres.editor.views.Imagen;
 import com.jtorres.editor.views.View;
 
 import javax.imageio.ImageIO;
@@ -13,35 +12,30 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class Window extends JFrame {
 
-    private final Control control = new Control();
-    private final View view = new View();
-    private final GridBagConstraints gbc = new GridBagConstraints();
+    private Control control = new Control();
+    private View view;
+    private GridBagConstraints gbc = new GridBagConstraints();
     private BufferedImage originalImage;
-    private final ImageConverter imageConverter;
-
-    private Imagen img2;
-    private Imagen img3;
-    private Imagen img4;
-
-    private ButtonsStatus button1Status;
-    private ButtonsStatus button2Status;
-    private ButtonsStatus button3Status;
+    private ImageConverter imageConverter;
 
 
     public Window() {
+        imageConverter = new ImageConverter();
+
+        view = new View(imageConverter);
+
+        ButtonsStatus buttonsStatus = control.getButtonStatus();
+
+        view.setAllStatus(buttonsStatus);
+
         setWindowLayout();
         setControlLayout();
         setViewLayout();
         setVisible(true);
-
-        button1Status = control.getButtonStatus();
-        button2Status = control.getButtonStatus();
-        button3Status = control.getButtonStatus();
-
-        imageConverter = new ImageConverter();
 
         control.getLoadImageBtn().addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -68,10 +62,10 @@ public class Window extends JFrame {
             }
             control.getData()[4][1] = alpha;
 
-            view.setBufferedImage1(originalImage);
-            view.setBufferedImage2(originalImage);
-            view.setBufferedImage3(originalImage);
-            view.setBufferedImage4(originalImage);
+            view.addImage(View.IMAGEN1, originalImage);
+            view.addImage(View.IMAGEN2, originalImage);
+            view.addImage(View.IMAGEN3, originalImage);
+            view.addImage(View.IMAGEN4, originalImage);
 
             gbc.gridx = 1;
             gbc.gridy = 0;
@@ -84,15 +78,15 @@ public class Window extends JFrame {
         });
 
         control.getImage1Btn().addActionListener(e -> {
-            control.paintSelected(button1Status);
+            restoreControl(View.IMAGEN1);
         });
 
         control.getImage2Btn().addActionListener(e -> {
-            control.paintSelected(button2Status);
+            restoreControl(View.IMAGEN2);
         });
 
         control.getImage3Btn().addActionListener(e -> {
-            control.paintSelected(button3Status);
+            restoreControl(View.IMAGEN3);
         });
 
         control.getTodoBtn().addActionListener(e -> {
@@ -138,112 +132,43 @@ public class Window extends JFrame {
 
     }
 
-    private BufferedImage filterApply() {
-
-        ButtonsStatus buttonsStatus = control.getButtonStatus();
-        BufferedImage copia = imageConverter.copyImage(originalImage);
-
-        int x1 = 0;
-        int x2 = 0;
-        int y1 = 0;
-        int y2 = 0;
-
-        if (buttonsStatus.isZona2Btn()) {
-            x1 = copia.getWidth() / buttonsStatus.getTamanoJsl();
-            x2 = (copia.getWidth() / buttonsStatus.getTamanoJsl()) * (buttonsStatus.getTamanoJsl() - 1);
-            y1 = copia.getHeight() / buttonsStatus.getTamanoJsl();
-            y2 = (copia.getHeight() / buttonsStatus.getTamanoJsl()) * (buttonsStatus.getTamanoJsl() - 1);
-        }
-
-        if (buttonsStatus.isResetBrilloBtn()) {
-
-            if (buttonsStatus.isGreyBtn()) {
-                copia = imageConverter.applyGrey(copia, x1, y1, x2, y2);
-            }
-
-            if (buttonsStatus.getFiltrosJsl() != 0) {
-                Filtro filtroSharp = new Filtro();
-                filtroSharp.filtroSharp();
-
-                Filtro filtroBlur = new Filtro();
-                filtroBlur.filtroDifuminado();
-
-                if (buttonsStatus.getFiltrosJsl() > 0) {
-                    copia = imageConverter.applyBlur(copia, filtroBlur, buttonsStatus.getFiltrosJsl(), x1, y1, x2, y2);
-                }
-
-                if (buttonsStatus.getFiltrosJsl() < 0) {
-                    copia = imageConverter.applySharp(copia, filtroSharp, buttonsStatus.getFiltrosJsl(), x1, y1, x2, y2);
-                }
-            }
-
-            control.getResetBrilloBtn().setSelected(false);
-            return copia;
-        }
-
-        if (buttonsStatus.getBrilloTotalJsl() != 0) {
-            copia = imageConverter.applyBrigthness(copia, buttonsStatus.getBrilloTotalJsl(), x1, y1, x2, y2);
-        }
-
-        if (buttonsStatus.getRojoJsl() != 0) {
-            copia = imageConverter.applyRed(copia, buttonsStatus.getRojoJsl(), x1, y1, x2, y2);
-        }
-
-        if (buttonsStatus.getVerdeJsl() != 0) {
-            copia = imageConverter.applyGreen(copia, buttonsStatus.getVerdeJsl(), x1, y1, x2, y2);
-        }
-
-        if (buttonsStatus.getAzulJsl() != 0) {
-            copia = imageConverter.applyBlue(copia, buttonsStatus.getAzulJsl(), x1, y1, x2, y2);
-
-        }
-
-        if (buttonsStatus.isGreyBtn()) {
-                copia = imageConverter.applyGrey(copia, x1, y1, x2, y2);
-        }
-
-        if (buttonsStatus.getFiltrosJsl() != 0) {
-            Filtro filtroSharp = new Filtro();
-            filtroSharp.filtroSharp();
-
-            Filtro filtroBlur = new Filtro();
-            filtroBlur.filtroDifuminado();
-
-            if (buttonsStatus.getFiltrosJsl() > 0) {
-                copia = imageConverter.applyBlur(copia, filtroBlur, buttonsStatus.getFiltrosJsl(), x1, y1, x2, y2);
-            }
-
-            if (buttonsStatus.getFiltrosJsl() < 0) {
-                copia = imageConverter.applySharp(copia, filtroSharp, buttonsStatus.getFiltrosJsl(), x1, y1, x2, y2);
-            }
-        }
-
-        return copia;
-
-
-    }
-
     private void imageSelector(Control control) {
         if (control.getImage1Btn().isSelected()) {
-            button1Status = control.getButtonStatus();
-            BufferedImage imagenConverted = filterApply();
-            view.setBufferedImage2(imagenConverted);
+            ButtonsStatus buttonsStatus = control.getButtonStatus();
+            if (control.getRectanguloBtn().isSelected()) {
+                view.setClipStatus(View.IMAGEN1, buttonsStatus);
+            }
+            if (control.getTodoBtn().isSelected()) {
+                view.setImageStatus(View.IMAGEN1, buttonsStatus);
+            }
         }
-
         if (control.getImage2Btn().isSelected()) {
-            button2Status = control.getButtonStatus();
-            BufferedImage imagenConverted = filterApply();
-            view.setBufferedImage3(imagenConverted);
+            ButtonsStatus buttonsStatus = control.getButtonStatus();
+            if (control.getRectanguloBtn().isSelected()) {
+                view.setClipStatus(View.IMAGEN2, buttonsStatus);
+            }
+            if (control.getTodoBtn().isSelected()) {
+                view.setImageStatus(View.IMAGEN2, buttonsStatus);
+            }
         }
-
-        if (control.getImage3Btn().isSelected()) {
-            button3Status = control.getButtonStatus();
-            BufferedImage imagenConverted = filterApply();
-            view.setBufferedImage4(imagenConverted);
+        if (control.getImage1Btn().isSelected()) {
+            ButtonsStatus buttonsStatus = control.getButtonStatus();
+            if (control.getRectanguloBtn().isSelected()) {
+                view.setClipStatus(View.IMAGEN3, buttonsStatus);
+            }
+            if (control.getTodoBtn().isSelected()) {
+                view.setImageStatus(View.IMAGEN3, buttonsStatus);
+            }
         }
+    }
 
-        view.repaint();
-
+    private void restoreControl(String imageName) {
+        if (control.getTodoBtn().isSelected()) {
+            control.paintSelected(view.getImageStatus(imageName));
+        }
+        if (control.getRectanguloBtn().isSelected()) {
+            control.paintSelected(view.getClipStatus(imageName));
+        }
     }
 
     private void resetBrightnessStatus() {
