@@ -1,23 +1,32 @@
 package com.jtorres.editor.model;
 public class ButtonsStatus {
-    private boolean zona1Btn;
-    private boolean zona2Btn;
+    private boolean todoBtn;
+    private boolean clipBtn;
     private int tamanoJsl;
     private boolean resetBrilloBtn;
     private int brilloTotalJsl;
+
+    public boolean isTodoBtn() {
+        return todoBtn;
+    }
+
+    public void setTodoBtn(boolean todoBtn) {
+        this.todoBtn = todoBtn;
+    }
+
+    public boolean isClipBtn() {
+        return clipBtn;
+    }
+
+    public void setClipBtn(boolean clipBtn) {
+        this.clipBtn = clipBtn;
+    }
+
     private int rojoJsl;
     private int verdeJsl;
     private int azulJsl;
     private boolean greyBtn;
     private int filtrosJsl;
-
-    public boolean isZona1Btn() {
-        return zona1Btn;
-    }
-
-    public void setZona1Btn(boolean zona1Btn) {
-        this.zona1Btn = zona1Btn;
-    }
 
     public boolean isResetBrilloBtn() {
         return resetBrilloBtn;
@@ -27,13 +36,6 @@ public class ButtonsStatus {
         this.resetBrilloBtn = resetBrilloBtn;
     }
 
-    public boolean isZona2Btn() {
-        return zona2Btn;
-    }
-
-    public void setZona2Btn(boolean zona2Btn) {
-        this.zona2Btn = zona2Btn;
-    }
 
     public int getTamanoJsl() {
         return tamanoJsl;

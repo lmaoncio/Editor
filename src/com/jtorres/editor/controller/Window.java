@@ -1,7 +1,6 @@
 package com.jtorres.editor.controller;
 
 import com.jtorres.editor.model.ButtonsStatus;
-import com.jtorres.editor.model.Filtro;
 import com.jtorres.editor.services.ImageConverter;
 import com.jtorres.editor.views.Control;
 import com.jtorres.editor.views.View;
@@ -12,29 +11,31 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 public class Window extends JFrame {
 
     private Control control = new Control();
-    private View view;
+    private View view1;
+    private View view2;
+    private View view3;
+    private View view4;
+
     private GridBagConstraints gbc = new GridBagConstraints();
     private BufferedImage originalImage;
     private ImageConverter imageConverter;
 
 
     public Window() {
+
         imageConverter = new ImageConverter();
 
-        view = new View(imageConverter);
-
-        ButtonsStatus buttonsStatus = control.getButtonStatus();
-
-        view.setAllStatus(buttonsStatus);
+        view1 = new View(imageConverter);
+        view2 = new View(imageConverter);
+        view3 = new View(imageConverter);
+        view4 = new View(imageConverter);
 
         setWindowLayout();
         setControlLayout();
-        setViewLayout();
         setVisible(true);
 
         control.getLoadImageBtn().addActionListener(e -> {
@@ -62,10 +63,7 @@ public class Window extends JFrame {
             }
             control.getData()[4][1] = alpha;
 
-            view.addImage(View.IMAGEN1, originalImage);
-            view.addImage(View.IMAGEN2, originalImage);
-            view.addImage(View.IMAGEN3, originalImage);
-            view.addImage(View.IMAGEN4, originalImage);
+            view1.addImage(originalImage);
 
             gbc.gridx = 1;
             gbc.gridy = 0;
@@ -73,28 +71,62 @@ public class Window extends JFrame {
             gbc.gridheight = 1;
             gbc.weightx = 1;
             gbc.weighty = 1;
+            gbc.fill = GridBagConstraints.BOTH;
+            add(view1, gbc);
 
-            add(view, gbc);
+            view2.addImage(imageConverter.copyImage(originalImage));
+
+            gbc.gridx = 2;
+            gbc.gridy = 0;
+            gbc.gridwidth = 1;
+            gbc.gridheight = 1;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            gbc.fill = GridBagConstraints.BOTH;
+            add(view2, gbc);
+
+            view3.addImage(imageConverter.copyImage(originalImage));
+
+            gbc.gridx = 1;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            gbc.gridheight = 1;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            gbc.fill = GridBagConstraints.BOTH;
+            add(view3, gbc);
+
+            view4.addImage(imageConverter.copyImage(originalImage));
+
+            gbc.gridx = 2;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            gbc.gridheight = 1;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            gbc.fill = GridBagConstraints.BOTH;
+            add(view4, gbc);
         });
 
         control.getImage1Btn().addActionListener(e -> {
-            restoreControl(View.IMAGEN1);
+
         });
 
         control.getImage2Btn().addActionListener(e -> {
-            restoreControl(View.IMAGEN2);
+
         });
 
         control.getImage3Btn().addActionListener(e -> {
-            restoreControl(View.IMAGEN3);
+
         });
 
         control.getTodoBtn().addActionListener(e -> {
-            imageSelector(control);
+
+
         });
 
         control.getRectanguloBtn().addActionListener(e -> {
-            imageSelector(control);
+
         });
 
         control.getTamanoJsl().addChangeListener(e -> {
@@ -129,45 +161,19 @@ public class Window extends JFrame {
         control.getFiltrosJsl().addChangeListener(e -> {
             imageSelector(control);
         });
-
     }
 
     private void imageSelector(Control control) {
         if (control.getImage1Btn().isSelected()) {
-            ButtonsStatus buttonsStatus = control.getButtonStatus();
-            if (control.getRectanguloBtn().isSelected()) {
-                view.setClipStatus(View.IMAGEN1, buttonsStatus);
-            }
             if (control.getTodoBtn().isSelected()) {
-                view.setImageStatus(View.IMAGEN1, buttonsStatus);
+                ButtonsStatus buttonsStatus = control.getButtonStatus();
+                view2.setImageStatus(buttonsStatus);
             }
-        }
-        if (control.getImage2Btn().isSelected()) {
-            ButtonsStatus buttonsStatus = control.getButtonStatus();
             if (control.getRectanguloBtn().isSelected()) {
-                view.setClipStatus(View.IMAGEN2, buttonsStatus);
+                ButtonsStatus buttonsStatus = control.getButtonStatus();
+                view2.setClipStatus(buttonsStatus);
             }
-            if (control.getTodoBtn().isSelected()) {
-                view.setImageStatus(View.IMAGEN2, buttonsStatus);
-            }
-        }
-        if (control.getImage1Btn().isSelected()) {
-            ButtonsStatus buttonsStatus = control.getButtonStatus();
-            if (control.getRectanguloBtn().isSelected()) {
-                view.setClipStatus(View.IMAGEN3, buttonsStatus);
-            }
-            if (control.getTodoBtn().isSelected()) {
-                view.setImageStatus(View.IMAGEN3, buttonsStatus);
-            }
-        }
-    }
 
-    private void restoreControl(String imageName) {
-        if (control.getTodoBtn().isSelected()) {
-            control.paintSelected(view.getImageStatus(imageName));
-        }
-        if (control.getRectanguloBtn().isSelected()) {
-            control.paintSelected(view.getClipStatus(imageName));
         }
     }
 
@@ -185,23 +191,11 @@ public class Window extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 0.1;
         gbc.weighty = 1;
 
         add(control, gbc);
-    }
-
-    public void setViewLayout() {
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-
-        add(view, gbc);
     }
 
     public void setWindowLayout() {

@@ -2,111 +2,97 @@ package com.jtorres.editor.views;
 
 import com.jtorres.editor.model.ButtonsStatus;
 import com.jtorres.editor.model.Filtro;
-import com.jtorres.editor.model.RectangleBound;
 import com.jtorres.editor.services.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
 public class View extends Canvas {
-    public static final String IMAGEN1 = "IMAGEN1";
-    public static final String IMAGEN2 = "IMAGEN2";
-    public static final String IMAGEN3 = "IMAGEN3";
-    public static final String IMAGEN4 = "IMAGEN4";
+    private BufferedImage image;
 
-    private Map<String, BufferedImage> images = new HashMap<>();
-    private Map<String, ButtonsStatus> imageStatuses = new HashMap<>();
-    private Map<String, ButtonsStatus> clipStatuses = new HashMap<>();
+    private ButtonsStatus imageStatus = new ButtonsStatus();
+    private ButtonsStatus clipStatus = new ButtonsStatus();
     private ImageConverter imageConverter;
-    
+
     public View(ImageConverter imageConverter) {
         super();
         this.imageConverter = imageConverter;
     }
 
     public void paint(Graphics g) {
-        if (images.isEmpty()) {
+        if (image == null) {
             return;
         }
 
-        if (images.get(IMAGEN1) != null) {
-          paintImage(IMAGEN1, 0,0, g);
-        }
-        if (images.get(IMAGEN2) != null) {
-            paintImage(IMAGEN2, getWidth()/2 ,0, g);
-        }
-        if (images.get(IMAGEN3) != null) {
-            paintImage(IMAGEN3, 0,getHeight()/2, g);
-        }
-        if (images.get(IMAGEN4) != null) {
-            paintImage(IMAGEN4, getWidth()/2,getHeight()/2, g);
+        if (image != null) {
+            paintImage(g);
         }
     }
 
-    public void setAllStatus(ButtonsStatus buttonsStatus) {
-        setImageStatus(IMAGEN1,buttonsStatus);
-        setImageStatus(IMAGEN2,buttonsStatus);
-        setImageStatus(IMAGEN3,buttonsStatus);
-        setImageStatus(IMAGEN4,buttonsStatus);
-        setClipStatus(IMAGEN1,buttonsStatus);
-        setClipStatus(IMAGEN2,buttonsStatus);
-        setClipStatus(IMAGEN3,buttonsStatus);
-        setClipStatus(IMAGEN4,buttonsStatus);
-    }
-
-    public void paintImage(String imageName, int xOffset, int yOffset, Graphics g) {
-        BufferedImage imagen = images.get(imageName);
+    public void paintImage(Graphics g) {
+        BufferedImage imagen = image;
         BufferedImage clip = null;
 
-        if (imageStatuses.get(imageName) != null) {
-            RectangleBound rectangleBound = new RectangleBound(0, 0, 0, 0);
-            ButtonsStatus status = imageStatuses.get(imageName);
-            imagen = applyFilterToImage(status, imagen, rectangleBound);
+        if (imageStatus != null) {
+            ButtonsStatus status = imageStatus;
+            imagen = applyFilterToImage(status, imagen);
         }
 
-        if (clipStatuses.get(imageName) != null && clipStatuses.get(imageName).isZona2Btn()) {
-            ButtonsStatus clipStatus = clipStatuses.get(imageName);
+        if (clipStatus != null && clipStatus.isClipBtn()) {
+            if (clipStatus.getTamanoJsl() != 0) {
+                ButtonsStatus clipStatus = this.clipStatus;
 
-            int centreX = imagen.getWidth() / 2;
-            int centreY = imagen.getHeight() / 2;
-            int clipWidth = (imagen.getWidth() * (clipStatus.getTamanoJsl() / 10));
-            int clipHeigh = (imagen.getHeight() * (clipStatus.getTamanoJsl() / 10));
-            int x1 = centreX - (clipWidth / 2);
-            int y1 = centreY - (clipHeigh / 2);
-            RectangleBound rectangleBound = new RectangleBound(0, 0, 0, 0);
+                int centreX = imagen.getWidth() / 2;
+                int centreY = imagen.getHeight() / 2;
+                float size = (float) clipStatus.getTamanoJsl() / 10;
+                int clipWidth = (int) (imagen.getWidth() * size);
+                int clipHeight = (int) (imagen.getHeight() * size);
+                int x1 = centreX - (clipWidth / 2);
+                int y1 = centreY - (clipHeight / 2);
 
-            clip = imagen.getSubimage(x1, y1, clipWidth, clipHeigh);
+                clip = imagen.getSubimage(x1, y1, clipWidth, clipHeight);
 
-            clip = applyFilterToImage(clipStatus, clip, rectangleBound);
+                clip = applyFilterToImage(clipStatus, clip);
 
-            g.drawImage(clip, x1 + xOffset, y1 + yOffset, clipWidth, clipHeigh, this);
+                g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+
+                int centreX2 = getWidth() / 2;
+                int centreY2 = getHeight() / 2;
+                int clipWidth2 = (int) (getWidth() * size);
+                int clipHeight2 = (int) (getHeight() * size);
+                int x2 = centreX2 - (clipWidth2 / 2);
+                int y2 = centreY2 - (clipHeight2 / 2);
+
+                g.drawImage(clip, x2 , y2 , clipWidth2, clipHeight2, this);
+
+                return;
+
+            }
         }
-        g.drawImage(imagen, xOffset, yOffset, getWidth() / 2, getHeight() / 2, this);
+
+        g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
     }
 
-    public BufferedImage applyFilterToImage(ButtonsStatus status, BufferedImage image, RectangleBound rectangleBound) {
-        ButtonsStatus buttonsStatus = imageStatuses.get(IMAGEN1);
+    public BufferedImage applyFilterToImage(ButtonsStatus buttonsStatus, BufferedImage image) {
 
         if (buttonsStatus.getBrilloTotalJsl() != 0) {
-            image = imageConverter.applyBrigthness(image, buttonsStatus.getBrilloTotalJsl(), rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+            image = imageConverter.applyBrigthness(image, buttonsStatus.getBrilloTotalJsl());
         }
 
         if (buttonsStatus.getRojoJsl() != 0) {
-            image = imageConverter.applyRed(image, buttonsStatus.getRojoJsl(), rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+            image = imageConverter.applyRed(image, buttonsStatus.getRojoJsl());
         }
 
         if (buttonsStatus.getVerdeJsl() != 0) {
-            image = imageConverter.applyGreen(image, buttonsStatus.getVerdeJsl(), rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+            image = imageConverter.applyGreen(image, buttonsStatus.getVerdeJsl());
         }
 
         if (buttonsStatus.getAzulJsl() != 0) {
-            image = imageConverter.applyBlue(image, buttonsStatus.getAzulJsl(), rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+            image = imageConverter.applyBlue(image, buttonsStatus.getAzulJsl());
         }
 
         if (buttonsStatus.isGreyBtn()) {
-            image = imageConverter.applyGrey(image, rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+            image = imageConverter.applyGrey(image);
         }
 
         if (buttonsStatus.getFiltrosJsl() != 0) {
@@ -117,47 +103,35 @@ public class View extends Canvas {
             filtroBlur.filtroDifuminado();
 
             if (buttonsStatus.getFiltrosJsl() > 0) {
-                image = imageConverter.applyBlur(image, filtroBlur, buttonsStatus.getFiltrosJsl(), rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+                image = imageConverter.applyBlur(image, filtroBlur, buttonsStatus.getFiltrosJsl());
             }
 
             if (buttonsStatus.getFiltrosJsl() < 0) {
-                image = imageConverter.applySharp(image, filtroSharp, buttonsStatus.getFiltrosJsl(), rectangleBound.getX1(), rectangleBound.getY1(), rectangleBound.getX2(), rectangleBound.getY2());
+                image = imageConverter.applySharp(image, filtroSharp, buttonsStatus.getFiltrosJsl());
             }
         }
         return image;
     }
 
-    public void addImage(String imageName, BufferedImage image) {
-        images.put(imageName, image);
+    public void addImage(BufferedImage image) {
+        this.image = image;
     }
 
-    public ButtonsStatus getImageStatus(String imageName) {
-       return imageStatuses.get(imageName);
+    public ButtonsStatus getImageStatus() {
+        return imageStatus;
     }
 
-    public void setImageStatus(String imageName, ButtonsStatus status) {
-        imageStatuses.put(imageName, status);
+    public void setImageStatus(ButtonsStatus status) {
+        this.imageStatus = status;
         repaint();
     }
 
-    public ButtonsStatus getClipStatus(String imageName) {
-       return imageStatuses.get(imageName);
+    public ButtonsStatus getClipStatus() {
+        return imageStatus;
     }
 
-    public void setClipStatus(String imageName, ButtonsStatus status) {
-        clipStatuses.put(imageName, status);
+    public void setClipStatus(ButtonsStatus status) {
+        this.clipStatus = status;
         repaint();
-    }
-
-    public void removeImage(String imageName, BufferedImage image) {
-        images.remove(imageName, image);
-    }
-
-    public void removeImageStatus(String imageName, ButtonsStatus status) {
-        imageStatuses.remove(imageName, status);
-    }
-
-    public void removeClipStatus(String imageName, ButtonsStatus status) {
-        clipStatuses.remove(imageName, status);
     }
 }

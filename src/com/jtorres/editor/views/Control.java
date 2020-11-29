@@ -154,7 +154,6 @@ public class Control extends JPanel {
         add(zonaTxt, gbc);
 
         todoBtn = new JToggleButton("TODO");
-        todoBtn.setSelected(true);
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.gridheight = 1;
@@ -312,11 +311,11 @@ public class Control extends JPanel {
         ButtonsStatus buttonsStatus = new ButtonsStatus();
 
         if (this.getTodoBtn().isSelected()) {
-            buttonsStatus.setZona1Btn(true);
+            buttonsStatus.setTodoBtn(true);
         }
 
         if (this.getRectanguloBtn().isSelected()) {
-            buttonsStatus.setZona2Btn(true);
+            buttonsStatus.setClipBtn(true);
         }
 
         if (this.getTamanoJsl().getValue() != 0) {
@@ -355,8 +354,8 @@ public class Control extends JPanel {
     }
 
     public void paintSelected(ButtonsStatus buttonsStatus) {
-        todoBtn.setSelected(buttonsStatus.isZona1Btn());
-        rectanguloBtn.setSelected(buttonsStatus.isZona2Btn());
+        todoBtn.setSelected(buttonsStatus.isTodoBtn());
+        rectanguloBtn.setSelected(buttonsStatus.isClipBtn());
         tamanoJsl.setValue(buttonsStatus.getTamanoJsl());
         resetBrilloBtn.setSelected(buttonsStatus.isResetBrilloBtn());
         brilloTotalJsl.setValue(buttonsStatus.getBrilloTotalJsl());
