@@ -1,7 +1,6 @@
 package com.jtorres.editor.services;
 
-import com.jtorres.editor.model.Filtro;
-
+import com.jtorres.editor.model.Filter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -26,7 +25,6 @@ public class ImageConverter {
                 int green = colorOriginal.getGreen();
                 int red = colorOriginal.getRed();
 
-
                 if (percent > 0) {
                     percent = percent / 10;
                     blue = (int) (blue + (blue * percent));
@@ -50,14 +48,12 @@ public class ImageConverter {
         return newImage;
     }
 
-    public BufferedImage applyBlur(BufferedImage bufferedImage, Filtro filter, int repeats) {
+    public BufferedImage applyBlur(BufferedImage bufferedImage, Filter filter, int repeats) {
 
         BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        byte[] pixels;
-        pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
-        byte[] result;
-        result = ((DataBufferByte) newImage.getRaster().getDataBuffer()).getData();
+        byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        byte[] result = ((DataBufferByte) newImage.getRaster().getDataBuffer()).getData();
 
         for (int lap = 0; lap < repeats; lap++) {
             for (int row = 0; row < bufferedImage.getHeight(); row++) {
@@ -150,7 +146,6 @@ public class ImageConverter {
                 int green = colorOriginal.getGreen();
                 int red = colorOriginal.getRed();
 
-
                 if (percent > 0) {
                     percent = percent / 10;
                     green = (int) (green + (green * percent));
@@ -210,7 +205,6 @@ public class ImageConverter {
                 int green = originalColor.getGreen();
                 int red = originalColor.getRed();
 
-
                 if (percent > 0) {
                     percent = percent / 10;
                     red = (int) (red + (red * percent));
@@ -234,7 +228,7 @@ public class ImageConverter {
         return newImage;
     }
 
-    public BufferedImage applySharp(BufferedImage bufferedImage, Filtro filtro, int repeats) {
+    public BufferedImage applySharp(BufferedImage bufferedImage, Filter filter, int repeats) {
         repeats = repeats * (-1);
 
         BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
@@ -256,12 +250,12 @@ public class ImageConverter {
                         positionToProcess = ((row) * (bufferedImage.getWidth() * 3) + ((column) * 3)) + (deep);
                         int backup = pixels[positionToProcess];
                         int valor = 0;
-                        for (int i = 0; i < filtro.getFilter().length; i++) {
-                            for (int j = 0; j < filtro.getFilter()[0].length; j++) {
+                        for (int i = 0; i < filter.getFilter().length; i++) {
+                            for (int j = 0; j < filter.getFilter()[0].length; j++) {
                                 int convolutionRow = row - 1 + i;
                                 int convolutionColumn = column - 1 + j;
                                 int pixelPosition = ((convolutionRow) * (bufferedImage.getWidth() * 3) + ((convolutionColumn) * 3)) + (deep);
-                                valor += Byte.toUnsignedInt(pixels[pixelPosition]) * filtro.getFilter()[i][j];
+                                valor += Byte.toUnsignedInt(pixels[pixelPosition]) * filter.getFilter()[i][j];
                             }
                         }
                         if (valor > 255) {
@@ -269,7 +263,7 @@ public class ImageConverter {
                             result[positionToProcess] = (byte) valor;
                             continue;
                         }
-                        valor = valor / filtro.getK();
+                        valor = valor / filter.getK();
                         valor = Math.max(valor, 0);
                         result[positionToProcess] = (byte) valor;
                     }
@@ -283,12 +277,10 @@ public class ImageConverter {
     }
 
     public BufferedImage copyImage(BufferedImage original) {
-
         ColorModel cm = original.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
         WritableRaster raster = original.copyData(original.getRaster().createCompatibleWritableRaster());
 
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
-
 }

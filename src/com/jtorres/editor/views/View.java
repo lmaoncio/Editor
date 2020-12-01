@@ -1,7 +1,7 @@
 package com.jtorres.editor.views;
 
 import com.jtorres.editor.model.ButtonsStatus;
-import com.jtorres.editor.model.Filtro;
+import com.jtorres.editor.model.Filter;
 import com.jtorres.editor.services.ImageConverter;
 
 import java.awt.*;
@@ -26,33 +26,29 @@ public class View extends Canvas {
     }
 
     public void paintImage(Graphics g) {
-        BufferedImage imagen = image;
+        BufferedImage image = this.image;
         BufferedImage clip;
 
         if (allStatus != null) {
-
             ButtonsStatus status = allStatus;
-            imagen = applyFilterToImage(status, imagen);
+            image = applyFilterToImage(status, image);
         }
 
         if (clipStatus != null && clipStatus.isClipBtn()) {
             if (clipStatus.getSizeJsl() != 0) {
-
                 ButtonsStatus clipStatus = this.clipStatus;
 
-                int centreX = imagen.getWidth() / 2;
-                int centreY = imagen.getHeight() / 2;
+                int centreX = image.getWidth() / 2;
+                int centreY = image.getHeight() / 2;
                 float size = (float) clipStatus.getSizeJsl() / 10;
-                int clipWidth = (int) (imagen.getWidth() * size);
-                int clipHeight = (int) (imagen.getHeight() * size);
+                int clipWidth = (int) (image.getWidth() * size);
+                int clipHeight = (int) (image.getHeight() * size);
                 int x1 = centreX - (clipWidth / 2);
                 int y1 = centreY - (clipHeight / 2);
 
-                clip = imagen.getSubimage(x1, y1, clipWidth, clipHeight);
+                clip = image.getSubimage(x1, y1, clipWidth, clipHeight);
 
                 clip = applyFilterToImage(clipStatus, clip);
-
-                g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
 
                 int centreX2 = getWidth() / 2;
                 int centreY2 = getHeight() / 2;
@@ -61,14 +57,14 @@ public class View extends Canvas {
                 int x2 = centreX2 - (clipWidth2 / 2);
                 int y2 = centreY2 - (clipHeight2 / 2);
 
+                g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+
                 g.drawImage(clip, x2 , y2 , clipWidth2, clipHeight2, this);
 
                 return;
-
             }
         }
-
-        g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+        g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
     }
 
     public BufferedImage applyFilterToImage(ButtonsStatus buttonsStatus, BufferedImage image) {
@@ -94,18 +90,18 @@ public class View extends Canvas {
         }
 
         if (buttonsStatus.getFilterJsl() != 0) {
-            Filtro filtroSharp = new Filtro();
-            filtroSharp.sharpFilter();
+            Filter sharpFilter = new Filter();
+            sharpFilter.sharpFilter();
 
-            Filtro filtroBlur = new Filtro();
-            filtroBlur.blurFilter();
+            Filter blurFilter = new Filter();
+            blurFilter.blurFilter();
 
             if (buttonsStatus.getFilterJsl() > 0) {
-                image = imageConverter.applyBlur(image, filtroBlur, buttonsStatus.getFilterJsl());
+                image = imageConverter.applyBlur(image, blurFilter, buttonsStatus.getFilterJsl());
             }
 
             if (buttonsStatus.getFilterJsl() < 0) {
-                image = imageConverter.applySharp(image, filtroSharp, buttonsStatus.getFilterJsl());
+                image = imageConverter.applySharp(image, sharpFilter, buttonsStatus.getFilterJsl());
             }
         }
         return image;

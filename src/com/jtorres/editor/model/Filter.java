@@ -1,5 +1,5 @@
 package com.jtorres.editor.model;
-public class Filtro {
+public class Filter {
     private int[][] filter;
     private int k;
 

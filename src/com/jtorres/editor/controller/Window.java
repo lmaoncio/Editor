@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 public class Window extends JFrame {
     private final Control control = new Control();
@@ -155,7 +154,6 @@ public class Window extends JFrame {
             view2.setAllStatus(control.getButtonStatus());
             imageStatus1.setAllStatus(control.getButtonStatus());
             imageStatus1.setStatus(false);
-
         }
         if (control.getClipBtn().isSelected()) {
             view2.setClipStatus(control.getButtonStatus());
@@ -192,7 +190,7 @@ public class Window extends JFrame {
 
         try {
             originalImage = ImageIO.read(new File(path));
-        } catch (IOException ioException) {
+        } catch (Exception ioException) {
             ioException.printStackTrace();
         }
 

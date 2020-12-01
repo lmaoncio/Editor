@@ -43,7 +43,7 @@ public class Control extends JPanel {
         gbc.weighty = 0.1;
         gbc.weightx = 0.1;
 
-        JTextArea loadImageTxt = new JTextArea("FILE");
+        JTextArea loadImageTxt = new JTextArea("File");
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
@@ -77,7 +77,7 @@ public class Control extends JPanel {
         gbc.gridheight = 1;
         add(dataTable.getTableHeader(), gbc);
 
-        JTextArea imageTxt = new JTextArea("IMAGE ");
+        JTextArea imageTxt = new JTextArea("Image ");
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridheight = 1;
@@ -116,7 +116,7 @@ public class Control extends JPanel {
         groupImgBtn.add(image3Btn);
 
 
-        JTextArea zoneTxt = new JTextArea("MODE");
+        JTextArea zoneTxt = new JTextArea("Mode");
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridheight = 1;
@@ -157,7 +157,7 @@ public class Control extends JPanel {
         gbc.gridwidth = 4;
         add(sizeJsl, gbc);
 
-        JTextArea brightnessTxt = new JTextArea("BRIGHTNESS");
+        JTextArea brightnessTxt = new JTextArea("Brightness");
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridheight = 1;
@@ -234,7 +234,7 @@ public class Control extends JPanel {
         gbc.gridwidth = 3;
         add(blueJsl, gbc);
 
-        JTextArea greyTxt = new JTextArea("COLOR");
+        JTextArea greyTxt = new JTextArea("Color");
         gbc.gridx = 0;
         gbc.gridy = 11;
         gbc.gridheight = 1;
@@ -248,7 +248,7 @@ public class Control extends JPanel {
         gbc.gridwidth = 3;
         add(greyBtn, gbc);
 
-        JTextArea filterTxt = new JTextArea("FILTERS");
+        JTextArea filterTxt = new JTextArea("Filters");
         gbc.gridx = 0;
         gbc.gridy = 12;
         gbc.gridheight = 1;
