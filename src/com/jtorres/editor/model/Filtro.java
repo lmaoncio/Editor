@@ -1,16 +1,16 @@
 package com.jtorres.editor.model;
 public class Filtro {
-    private int[][] filtro;
-    private int divisorK;
+    private int[][] filter;
+    private int k;
 
-    public void calcularK() {
+    public void calculateK() {
         int divisorK = 0;
-        int temp = 0;
+        int temp;
 
 
-        for (int x = 0; x < filtro.length ; x++) {
-            for (int y = 0; y < filtro[0].length; y++) {
-                temp = filtro[x][y];
+        for (int[] ints : filter) {
+            for (int y = 0; y < filter[0].length; y++) {
+                temp = ints[y];
                 divisorK = divisorK + temp;
             }
         }
@@ -19,10 +19,10 @@ public class Filtro {
             divisorK = 1;
         }
 
-        this.setDivisorK(divisorK);
+        this.setK(divisorK);
     }
 
-    public void filtroDifuminado() {
+    public void blurFilter() {
         int[][] f = new int[3][3];
         f[0][0] = 5;
         f[0][1] = 5;
@@ -33,26 +33,11 @@ public class Filtro {
         f[2][0] = 5;
         f[2][1] = 5;
         f[2][2] = 5;
-        this.setFiltro(f);
-        calcularK();
+        this.setFilter(f);
+        calculateK();
     }
 
-    public void filtroNegativo() {
-        int[][] f = new int[3][3];
-        f[0][0] = -1;
-        f[0][1] = -1;
-        f[0][2] = -1;
-        f[1][0] = 0;
-        f[1][1] = 0;
-        f[1][2] = 0;
-        f[2][0] = 1;
-        f[2][1] = 1;
-        f[2][2] = 1;
-        this.setFiltro(f);
-        calcularK();
-    }
-
-    public void filtroSharp() {
+    public void sharpFilter() {
         int[][] f = new int[3][3];
         f[0][0] = 0;
         f[0][1] = -1;
@@ -63,23 +48,23 @@ public class Filtro {
         f[2][0] = 0;
         f[2][1] = -1;
         f[2][2] = 0;
-        this.setFiltro(f);
-        calcularK();
+        this.setFilter(f);
+        calculateK();
     }
 
-    public int[][] getFiltro() {
-        return filtro;
+    public int[][] getFilter() {
+        return filter;
     }
 
-    public void setFiltro(int[][] filtro) {
-        this.filtro = filtro;
+    public void setFilter(int[][] filter) {
+        this.filter = filter;
     }
 
-    public int getDivisorK() {
-        return divisorK;
+    public int getK() {
+        return k;
     }
 
-    public void setDivisorK(int divisorK) {
-        this.divisorK = divisorK;
+    public void setK(int k) {
+        this.k = k;
     }
 }

@@ -9,10 +9,9 @@ import java.awt.image.BufferedImage;
 
 public class View extends Canvas {
     private BufferedImage image;
-
-    private ButtonsStatus imageStatus = new ButtonsStatus();
-    private ButtonsStatus clipStatus = new ButtonsStatus();
-    private ImageConverter imageConverter;
+    private ButtonsStatus allStatus;
+    private ButtonsStatus clipStatus;
+    private final ImageConverter imageConverter;
 
     public View(ImageConverter imageConverter) {
         super();
@@ -23,28 +22,27 @@ public class View extends Canvas {
         if (image == null) {
             return;
         }
-
-        if (image != null) {
             paintImage(g);
-        }
     }
 
     public void paintImage(Graphics g) {
         BufferedImage imagen = image;
-        BufferedImage clip = null;
+        BufferedImage clip;
 
-        if (imageStatus != null) {
-            ButtonsStatus status = imageStatus;
+        if (allStatus != null) {
+
+            ButtonsStatus status = allStatus;
             imagen = applyFilterToImage(status, imagen);
         }
 
         if (clipStatus != null && clipStatus.isClipBtn()) {
-            if (clipStatus.getTamanoJsl() != 0) {
+            if (clipStatus.getSizeJsl() != 0) {
+
                 ButtonsStatus clipStatus = this.clipStatus;
 
                 int centreX = imagen.getWidth() / 2;
                 int centreY = imagen.getHeight() / 2;
-                float size = (float) clipStatus.getTamanoJsl() / 10;
+                float size = (float) clipStatus.getSizeJsl() / 10;
                 int clipWidth = (int) (imagen.getWidth() * size);
                 int clipHeight = (int) (imagen.getHeight() * size);
                 int x1 = centreX - (clipWidth / 2);
@@ -75,39 +73,39 @@ public class View extends Canvas {
 
     public BufferedImage applyFilterToImage(ButtonsStatus buttonsStatus, BufferedImage image) {
 
-        if (buttonsStatus.getBrilloTotalJsl() != 0) {
-            image = imageConverter.applyBrigthness(image, buttonsStatus.getBrilloTotalJsl());
+        if (buttonsStatus.getBrightness() != 0) {
+            image = imageConverter.applyBrightness(image, buttonsStatus.getBrightness());
         }
 
-        if (buttonsStatus.getRojoJsl() != 0) {
-            image = imageConverter.applyRed(image, buttonsStatus.getRojoJsl());
+        if (buttonsStatus.getRedJsl() != 0) {
+            image = imageConverter.applyRed(image, buttonsStatus.getRedJsl());
         }
 
-        if (buttonsStatus.getVerdeJsl() != 0) {
-            image = imageConverter.applyGreen(image, buttonsStatus.getVerdeJsl());
+        if (buttonsStatus.getGreenJsl() != 0) {
+            image = imageConverter.applyGreen(image, buttonsStatus.getGreenJsl());
         }
 
-        if (buttonsStatus.getAzulJsl() != 0) {
-            image = imageConverter.applyBlue(image, buttonsStatus.getAzulJsl());
+        if (buttonsStatus.getBlueJsl() != 0) {
+            image = imageConverter.applyBlue(image, buttonsStatus.getBlueJsl());
         }
 
         if (buttonsStatus.isGreyBtn()) {
             image = imageConverter.applyGrey(image);
         }
 
-        if (buttonsStatus.getFiltrosJsl() != 0) {
+        if (buttonsStatus.getFilterJsl() != 0) {
             Filtro filtroSharp = new Filtro();
-            filtroSharp.filtroSharp();
+            filtroSharp.sharpFilter();
 
             Filtro filtroBlur = new Filtro();
-            filtroBlur.filtroDifuminado();
+            filtroBlur.blurFilter();
 
-            if (buttonsStatus.getFiltrosJsl() > 0) {
-                image = imageConverter.applyBlur(image, filtroBlur, buttonsStatus.getFiltrosJsl());
+            if (buttonsStatus.getFilterJsl() > 0) {
+                image = imageConverter.applyBlur(image, filtroBlur, buttonsStatus.getFilterJsl());
             }
 
-            if (buttonsStatus.getFiltrosJsl() < 0) {
-                image = imageConverter.applySharp(image, filtroSharp, buttonsStatus.getFiltrosJsl());
+            if (buttonsStatus.getFilterJsl() < 0) {
+                image = imageConverter.applySharp(image, filtroSharp, buttonsStatus.getFilterJsl());
             }
         }
         return image;
@@ -117,17 +115,9 @@ public class View extends Canvas {
         this.image = image;
     }
 
-    public ButtonsStatus getImageStatus() {
-        return imageStatus;
-    }
-
-    public void setImageStatus(ButtonsStatus status) {
-        this.imageStatus = status;
+    public void setAllStatus(ButtonsStatus status) {
+        this.allStatus = status;
         repaint();
-    }
-
-    public ButtonsStatus getClipStatus() {
-        return imageStatus;
     }
 
     public void setClipStatus(ButtonsStatus status) {

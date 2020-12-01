@@ -10,275 +10,283 @@ import java.awt.image.WritableRaster;
 
 public class ImageConverter {
 
-    public BufferedImage applyBlue(BufferedImage bufferedImage, double porcentaje) {
+    public BufferedImage applyBlue(BufferedImage bufferedImage, double percent) {
 
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+        BufferedImage newImage;
+        newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        double temp = porcentaje;
+        double temp;
+        temp = percent;
 
         for (int x = 0; x < bufferedImage.getWidth(); x++) {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                    Color colorOriginal = new Color(bufferedImage.getRGB(x, y));
+                Color colorOriginal = new Color(bufferedImage.getRGB(x, y));
 
-                    int blue = colorOriginal.getBlue();
-                    int green = colorOriginal.getGreen();
-                    int red = colorOriginal.getRed();
+                int blue = colorOriginal.getBlue();
+                int green = colorOriginal.getGreen();
+                int red = colorOriginal.getRed();
 
 
-                    if (porcentaje > 0) {
-                        porcentaje = porcentaje / 10;
-                        blue = (int) (blue + (blue * porcentaje));
-                        porcentaje = temp;
-                    }
+                if (percent > 0) {
+                    percent = percent / 10;
+                    blue = (int) (blue + (blue * percent));
+                    percent = temp;
+                }
 
-                    if (porcentaje < 0) {
-                        porcentaje = porcentaje * (-1) / 10;
-                        blue = (int) (blue - (blue * porcentaje));
-                        porcentaje = temp;
-                    }
+                if (percent < 0) {
+                    percent = percent * (-1) / 10;
+                    blue = (int) (blue - (blue * percent));
+                    percent = temp;
+                }
 
-                    blue = blue > 255 ? 255 : blue;
-                    blue = blue < 0 ? 0 : blue;
+                blue = Math.min(blue, 255);
+                blue = Math.max(blue, 0);
 
-                    Color colorCopia = new Color(red, green, blue);
+                Color copyColor = new Color(red, green, blue);
 
-                    nuevaImagen.setRGB(x, y, colorCopia.getRGB());
+                newImage.setRGB(x, y, copyColor.getRGB());
             }
         }
-        return nuevaImagen;
+        return newImage;
     }
 
-    public BufferedImage applyBlur(BufferedImage bufferedImage, Filtro filtro, int repeticiones) {
+    public BufferedImage applyBlur(BufferedImage bufferedImage, Filtro filter, int repeats) {
 
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
-        byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
-        byte[] resultado = ((DataBufferByte) nuevaImagen.getRaster().getDataBuffer()).getData();
+        BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        for (int vuelta = 0; vuelta < repeticiones; vuelta++) {
-            for (int fila = 0; fila < bufferedImage.getHeight(); fila++) {
-                if (fila == 0 || fila == bufferedImage.getHeight() - 1) {
+        byte[] pixels;
+        pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        byte[] result;
+        result = ((DataBufferByte) newImage.getRaster().getDataBuffer()).getData();
+
+        for (int lap = 0; lap < repeats; lap++) {
+            for (int row = 0; row < bufferedImage.getHeight(); row++) {
+                if (row == 0 || row == bufferedImage.getHeight() - 1) {
                     continue;
                 }
-                for (int columna = 0; columna < bufferedImage.getWidth(); columna++) {
-                    if (columna == 0 || columna == bufferedImage.getWidth() - 1) {
+                for (int column = 0; column < bufferedImage.getWidth(); column++) {
+                    if (column == 0 || column == bufferedImage.getWidth() - 1) {
                         continue;
                     }
-                    int posicionAProcesar = 0;
-                    for (int profundidad = 0; profundidad < 3; profundidad++) {
-                            posicionAProcesar = ((fila) * (bufferedImage.getWidth() * 3) + ((columna) * 3)) + (profundidad);
-                            int valor = 0;
-                            for (int i = 0; i < filtro.getFiltro().length; i++) {
-                                for (int j = 0; j < filtro.getFiltro()[0].length; j++) {
-                                    int filaConvolucion = fila - 1 + i;
-                                    int columnaConvolucion = columna - 1 + j;
-                                    int posicionPixel = ((filaConvolucion) * (bufferedImage.getWidth() * 3) + ((columnaConvolucion) * 3)) + (profundidad);
-                                    valor += Byte.toUnsignedInt(pixels[posicionPixel]) * filtro.getFiltro()[i][j];
-                                }
+                    int positionToProcess;
+                    for (int deep = 0; deep < 3; deep++) {
+                        positionToProcess = (((row) * (bufferedImage.getWidth() * 3)) + ((column) * 3)) + deep;
+                        int valor = 0;
+                        for (int i = 0; i < filter.getFilter().length; i++) {
+                            for (int j = 0; j < filter.getFilter()[0].length; j++) {
+                                int convolutionRow = row - 1 + i;
+                                int convolutionColumn = column - 1 + j;
+                                int pixelPosition = ((convolutionRow) * (bufferedImage.getWidth() * 3) + ((convolutionColumn) * 3)) + (deep);
+                                valor += Byte.toUnsignedInt(pixels[pixelPosition]) * filter.getFilter()[i][j];
                             }
-                            valor = valor / filtro.getDivisorK();
-                            valor = valor > 255 ? 255 : valor;
-                            valor = valor < 0 ? 0 : valor;
-                            resultado[posicionAProcesar] = (byte) valor;
+                        }
+                        valor = valor / filter.getK();
+                        valor = Math.min(valor, 255);
+                        valor = Math.max(valor, 0);
+                        result[positionToProcess] = (byte) valor;
                     }
                 }
             }
-            pixels = resultado;
+            pixels = result;
         }
-        return nuevaImagen;
+        return newImage;
     }
 
-    public BufferedImage applyBrigthness(BufferedImage bufferedImage, double porcentaje) {
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+    public BufferedImage applyBrightness(BufferedImage bufferedImage, double percent) {
+        BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        porcentaje = porcentaje / 10;
+        percent = percent / 10;
 
         for (int x = 0; x < bufferedImage.getWidth(); x++) {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                    Color colorOriginal = new Color(bufferedImage.getRGB(x, y));
+                Color originalColor = new Color(bufferedImage.getRGB(x, y));
 
-                    int blue = colorOriginal.getBlue();
-                    int green = colorOriginal.getGreen();
-                    int red = colorOriginal.getRed();
+                int blue = originalColor.getBlue();
+                int green = originalColor.getGreen();
+                int red = originalColor.getRed();
 
-                    if (porcentaje < 0) {
-                        porcentaje = porcentaje * (-1);
-                        blue = (int) (blue - (blue * porcentaje));
-                        green = (int) (green - (green * porcentaje));
-                        red = (int) (red - (red * porcentaje));
-                        porcentaje = porcentaje * (-1);
-                    }
+                if (percent < 0) {
+                    percent = percent * (-1);
+                    blue = (int) (blue - (blue * percent));
+                    green = (int) (green - (green * percent));
+                    red = (int) (red - (red * percent));
+                    percent = percent * (-1);
+                }
 
-                    if (porcentaje > 0) {
-                        blue = (int) (blue + (blue * porcentaje));
-                        green = (int) (green + (green * porcentaje));
-                        red = (int) (red + (red * porcentaje));
-                    }
+                if (percent > 0) {
+                    blue = (int) (blue + (blue * percent));
+                    green = (int) (green + (green * percent));
+                    red = (int) (red + (red * percent));
+                }
 
-                    red = red > 255 ? 255 : red;
-                    red = red < 0 ? 0 : red;
-                    green = green > 255 ? 255 : green;
-                    green = green < 0 ? 1 : green;
-                    blue = blue > 255 ? 255 : blue;
-                    blue = blue < 0 ? 0 : blue;
+                red = Math.min(red, 255);
+                red = Math.max(red, 0);
+                green = Math.min(green, 255);
+                green = green < 0 ? 1 : green;
+                blue = Math.min(blue, 255);
+                blue = Math.max(blue, 0);
 
-                    Color colorCopia = new Color(red, green, blue);
+                Color copyColor = new Color(red, green, blue);
 
-                    nuevaImagen.setRGB(x, y, colorCopia.getRGB());
+                newImage.setRGB(x, y, copyColor.getRGB());
             }
         }
-        return nuevaImagen;
+        return newImage;
     }
 
-    public BufferedImage applyGreen(BufferedImage bufferedImage, double porcentaje) {
+    public BufferedImage applyGreen(BufferedImage bufferedImage, double percent) {
 
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+        BufferedImage newImage;
+        newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        double temp = porcentaje;
+        double temp;
+        temp = percent;
 
         for (int x = 0; x < bufferedImage.getWidth(); x++) {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                    Color colorOriginal = new Color(bufferedImage.getRGB(x, y));
+                Color colorOriginal = new Color(bufferedImage.getRGB(x, y));
 
-                    int blue = colorOriginal.getBlue();
-                    int green = colorOriginal.getGreen();
-                    int red = colorOriginal.getRed();
+                int blue = colorOriginal.getBlue();
+                int green = colorOriginal.getGreen();
+                int red = colorOriginal.getRed();
 
 
-                    if (porcentaje > 0) {
-                        porcentaje = porcentaje / 10;
-                        green = (int) (green + (green * porcentaje));
-                        porcentaje = temp;
-                    }
+                if (percent > 0) {
+                    percent = percent / 10;
+                    green = (int) (green + (green * percent));
+                    percent = temp;
+                }
 
-                    if (porcentaje < 0) {
-                        porcentaje = porcentaje * (-1) / 10;
-                        green = (int) (green - (green * porcentaje));
-                        porcentaje = temp;
-                    }
+                if (percent < 0) {
+                    percent = percent * (-1) / 10;
+                    green = (int) (green - (green * percent));
+                    percent = temp;
+                }
 
-                    green = green > 255 ? 255 : green;
-                    green = green < 0 ? 0 : green;
+                green = Math.min(green, 255);
+                green = Math.max(green, 0);
 
-                    Color colorCopia = new Color(red, green, blue);
+                Color copyColor = new Color(red, green, blue);
 
-                    nuevaImagen.setRGB(x, y, colorCopia.getRGB());
+                newImage.setRGB(x, y, copyColor.getRGB());
             }
         }
-        return nuevaImagen;
+        return newImage;
     }
 
     public BufferedImage applyGrey(BufferedImage bufferedImage) {
 
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+        BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        for (int x = 0; x < nuevaImagen.getWidth(); x++) {
-            for (int y = 0; y < nuevaImagen.getHeight(); y++) {
+        for (int x = 0; x < newImage.getWidth(); x++) {
+            for (int y = 0; y < newImage.getHeight(); y++) {
                 Color color = new Color(bufferedImage.getRGB(x, y));
                 int red = color.getRed();
                 int green = color.getGreen();
                 int blue = color.getBlue();
-                int media = (red + green + blue) / 3;
-                red = media;
-                green = media;
-                blue = media;
-                Color resultado = new Color(red, green, blue);
-                nuevaImagen.setRGB(x, y, resultado.getRGB());
+                int average = (red + green + blue) / 3;
+                red = average;
+                green = average;
+                blue = average;
+                Color result = new Color(red, green, blue);
+                newImage.setRGB(x, y, result.getRGB());
             }
         }
 
-        return nuevaImagen;
+        return newImage;
     }
 
-    public BufferedImage applyRed(BufferedImage bufferedImage, double porcentaje) {
+    public BufferedImage applyRed(BufferedImage bufferedImage, double percent) {
 
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+        BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 
-        double temp = porcentaje;
+        double temp = percent;
 
         for (int x = 0; x < bufferedImage.getWidth(); x++) {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                    Color colorOriginal = new Color(bufferedImage.getRGB(x, y));
+                Color originalColor = new Color(bufferedImage.getRGB(x, y));
 
-                    int blue = colorOriginal.getBlue();
-                    int green = colorOriginal.getGreen();
-                    int red = colorOriginal.getRed();
+                int blue = originalColor.getBlue();
+                int green = originalColor.getGreen();
+                int red = originalColor.getRed();
 
 
-                    if (porcentaje > 0) {
-                        porcentaje = porcentaje / 10;
-                        red = (int) (red + (red * porcentaje));
-                        porcentaje = temp;
-                    }
+                if (percent > 0) {
+                    percent = percent / 10;
+                    red = (int) (red + (red * percent));
+                    percent = temp;
+                }
 
-                    if (porcentaje < 0) {
-                        porcentaje = porcentaje * (-1) / 10;
-                        red = (int) (red - (red * porcentaje));
-                        porcentaje = temp;
-                    }
+                if (percent < 0) {
+                    percent = percent * (-1) / 10;
+                    red = (int) (red - (red * percent));
+                    percent = temp;
+                }
 
-                    red = red > 255 ? 255 : red;
-                    red = red < 0 ? 0 : red;
+                red = Math.min(red, 255);
+                red = Math.max(red, 0);
 
-                    Color colorCopia = new Color(red, green, blue);
+                Color copyColor = new Color(red, green, blue);
 
-                    nuevaImagen.setRGB(x, y, colorCopia.getRGB());
+                newImage.setRGB(x, y, copyColor.getRGB());
             }
         }
-        return nuevaImagen;
+        return newImage;
     }
 
-    public BufferedImage applySharp(BufferedImage bufferedImage, Filtro filtro, int repeticiones) {
-        repeticiones = repeticiones * (-1);
+    public BufferedImage applySharp(BufferedImage bufferedImage, Filtro filtro, int repeats) {
+        repeats = repeats * (-1);
 
-        BufferedImage nuevaImagen = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+        BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
         byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
-        byte[] resultado = ((DataBufferByte) nuevaImagen.getRaster().getDataBuffer()).getData();
+        byte[] result;
+        result = ((DataBufferByte) newImage.getRaster().getDataBuffer()).getData();
 
-        for (int vuelta = 0; vuelta < repeticiones; vuelta++) {
-            for (int fila = 0; fila < bufferedImage.getHeight(); fila++) {
-                if (fila == 0 || fila == bufferedImage.getHeight() - 1) {
+        for (int lap = 0; lap < repeats; lap++) {
+            for (int row = 0; row < bufferedImage.getHeight(); row++) {
+                if (row == 0 || row == bufferedImage.getHeight() - 1) {
                     continue;
                 }
-                for (int columna = 0; columna < bufferedImage.getWidth(); columna++) {
-                    if (columna == 0 || columna == bufferedImage.getWidth() - 1) {
+                for (int column = 0; column < bufferedImage.getWidth(); column++) {
+                    if (column == 0 || column == bufferedImage.getWidth() - 1) {
                         continue;
                     }
-                    int posicionAProcesar = 0;
-                    for (int profundidad = 0; profundidad < 3; profundidad++) {
-                            posicionAProcesar = ((fila) * (bufferedImage.getWidth() * 3) + ((columna) * 3)) + (profundidad);
-                            int backup1 = pixels[posicionAProcesar];
-                            int valor = 0;
-                            for (int i = 0; i < filtro.getFiltro().length; i++) {
-                                for (int j = 0; j < filtro.getFiltro()[0].length; j++) {
-                                    int filaConvolucion = fila - 1 + i;
-                                    int columnaConvolucion = columna - 1 + j;
-                                    int posicionPixel = ((filaConvolucion) * (bufferedImage.getWidth() * 3) + ((columnaConvolucion) * 3)) + (profundidad);
-                                    valor += Byte.toUnsignedInt(pixels[posicionPixel]) * filtro.getFiltro()[i][j];
-                                }
+                    int positionToProcess;
+                    for (int deep = 0; deep < 3; deep++) {
+                        positionToProcess = ((row) * (bufferedImage.getWidth() * 3) + ((column) * 3)) + (deep);
+                        int backup = pixels[positionToProcess];
+                        int valor = 0;
+                        for (int i = 0; i < filtro.getFilter().length; i++) {
+                            for (int j = 0; j < filtro.getFilter()[0].length; j++) {
+                                int convolutionRow = row - 1 + i;
+                                int convolutionColumn = column - 1 + j;
+                                int pixelPosition = ((convolutionRow) * (bufferedImage.getWidth() * 3) + ((convolutionColumn) * 3)) + (deep);
+                                valor += Byte.toUnsignedInt(pixels[pixelPosition]) * filtro.getFilter()[i][j];
                             }
-                            if (valor > 255) {
-                                valor = backup1;
-                                resultado[posicionAProcesar] = (byte) valor;
-                                continue;
-                            }
-                            valor = valor / filtro.getDivisorK();
-                            valor = valor < 0 ? 0 : valor;
-                            resultado[posicionAProcesar] = (byte) valor;
+                        }
+                        if (valor > 255) {
+                            valor = backup;
+                            result[positionToProcess] = (byte) valor;
+                            continue;
+                        }
+                        valor = valor / filtro.getK();
+                        valor = Math.max(valor, 0);
+                        result[positionToProcess] = (byte) valor;
                     }
                 }
             }
 
-            pixels = resultado;
+            pixels = result;
         }
 
-        return nuevaImagen;
+        return newImage;
     }
 
-    public BufferedImage copyImage(BufferedImage origen) {
+    public BufferedImage copyImage(BufferedImage original) {
 
-        ColorModel cm = origen.getColorModel();
+        ColorModel cm = original.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = origen.copyData(origen.getRaster().createCompatibleWritableRaster());
+        WritableRaster raster = original.copyData(original.getRaster().createCompatibleWritableRaster());
 
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
