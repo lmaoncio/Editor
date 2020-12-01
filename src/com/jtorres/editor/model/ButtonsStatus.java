@@ -1,93 +1,90 @@
 package com.jtorres.editor.model;
 public class ButtonsStatus {
-    private boolean zona1Btn;
-    private boolean zona2Btn;
-    private int tamanoJsl;
-    private boolean resetBrilloBtn;
-    private int brilloTotalJsl;
-    private int rojoJsl;
-    private int verdeJsl;
-    private int azulJsl;
+    private boolean allBtn;
+    private boolean clipBtn;
+    private int sizeJsl;
+    private boolean resetBrightness;
+    private int brightness;
+    private int redJsl;
+    private int greenJsl;
+    private int blueJsl;
     private boolean greyBtn;
-    private int filtrosJsl;
+    private int filterJsl;
 
-    public boolean isZona1Btn() {
-        return zona1Btn;
+    public void setAllBtn(boolean allBtn) {
+        this.allBtn = allBtn;
     }
 
-    public void setZona1Btn(boolean zona1Btn) {
-        this.zona1Btn = zona1Btn;
+    public boolean isClipBtn() {
+        return clipBtn;
     }
 
-    public boolean isResetBrilloBtn() {
-        return resetBrilloBtn;
+    public void setClipBtn(boolean clipBtn) {
+        this.clipBtn = clipBtn;
     }
 
-    public void setResetBrilloBtn(boolean resetBrilloBtn) {
-        this.resetBrilloBtn = resetBrilloBtn;
+    public boolean isResetBrightness() {
+        return resetBrightness;
     }
 
-    public boolean isZona2Btn() {
-        return zona2Btn;
+    public void setResetBrightness(boolean resetBrightness) {
+        this.resetBrightness = resetBrightness;
     }
 
-    public void setZona2Btn(boolean zona2Btn) {
-        this.zona2Btn = zona2Btn;
+
+    public int getSizeJsl() {
+        return sizeJsl;
     }
 
-    public int getTamanoJsl() {
-        return tamanoJsl;
+    public void setSizeJsl(int sizeJsl) {
+        this.sizeJsl = sizeJsl;
     }
 
-    public void setTamanoJsl(int tamanoJsl) {
-        this.tamanoJsl = tamanoJsl;
+    public int getBrightness() {
+        return brightness;
     }
 
-    public int getBrilloTotalJsl() {
-        return brilloTotalJsl;
+    public void setBrightness(int brightness) {
+        this.brightness = brightness;
     }
 
-    public void setBrilloTotalJsl(int brilloTotalJsl) {
-        this.brilloTotalJsl = brilloTotalJsl;
+    public int getRedJsl() {
+        return redJsl;
     }
 
-    public int getRojoJsl() {
-        return rojoJsl;
+    public void setRedJsl(int redJsl) {
+        this.redJsl = redJsl;
     }
 
-    public void setRojoJsl(int rojoJsl) {
-        this.rojoJsl = rojoJsl;
+    public int getGreenJsl() {
+        return greenJsl;
     }
 
-    public int getVerdeJsl() {
-        return verdeJsl;
+    public void setGreenJsl(int greenJsl) {
+        this.greenJsl = greenJsl;
     }
 
-    public void setVerdeJsl(int verdeJsl) {
-        this.verdeJsl = verdeJsl;
+    public int getBlueJsl() {
+        return blueJsl;
     }
 
-    public int getAzulJsl() {
-        return azulJsl;
-    }
-
-    public void setAzulJsl(int azulJsl) {
-        this.azulJsl = azulJsl;
+    public void setBlueJsl(int blueJsl) {
+        this.blueJsl = blueJsl;
     }
 
     public void setGreyBtn(boolean greyBtn) {
         this.greyBtn = greyBtn;
     }
 
-    public int getFiltrosJsl() {
-        return filtrosJsl;
+    public int getFilterJsl() {
+        return filterJsl;
     }
 
     public boolean isGreyBtn() {
         return greyBtn;
     }
 
-    public void setFiltrosJsl(int filtrosJsl) {
-        this.filtrosJsl = filtrosJsl;
+    public void setFilterJsl(int filterJsl) {
+        this.filterJsl = filterJsl;
     }
 }
